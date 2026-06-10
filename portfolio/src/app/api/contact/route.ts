@@ -6,9 +6,7 @@ export async function POST(req: Request) {
     const { name, email, subject, message } = await req.json();
 
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
+      service: "gmail",
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -23,16 +21,24 @@ export async function POST(req: Request) {
         <h3>New Contact Form Submission</h3>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject || "No Subject"}</p>
         <p><strong>Message:</strong></p>
         <p>${message}</p>
       `,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: "Email sent successfully",
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Email Error:", error);
+
     return NextResponse.json(
-      { error: "Failed to send email" },
+      {
+        success: false,
+        error: "Failed to send email",
+      },
       { status: 500 }
     );
   }
