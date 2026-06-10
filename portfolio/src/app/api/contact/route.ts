@@ -15,12 +15,21 @@ export async function POST(req: Request) {
     console.log("About to send email...");
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
+
+    console.log("Verifying SMTP...");
+    await transporter.verify();
+    console.log("SMTP verified");
 
     await transporter.sendMail({
       from: process.env.SMTP_USER,
