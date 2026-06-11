@@ -12,7 +12,40 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("About to send email...");
+    // 1. Try Web3Forms if ACCESS_KEY is set (prevents SMTP port blocks on Render/Vercel)
+    const web3FormsKey = process.env.WEB3FORMS_ACCESS_KEY;
+    if (web3FormsKey) {
+      console.log("Sending email via Web3Forms API...");
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          access_key: web3FormsKey,
+          name: name,
+          email: email,
+          subject: subject || "Portfolio Contact Form Submission",
+          message: message,
+          from_name: `${name} (Portfolio)`,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        console.log("Email sent successfully via Web3Forms");
+        return NextResponse.json({
+          success: true,
+          message: "Email sent successfully",
+        });
+      } else {
+        throw new Error(data.message || "Web3Forms failed to send email");
+      }
+    }
+
+    // 2. Fallback to SMTP
+    console.log("About to send email via SMTP...");
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -46,7 +79,7 @@ export async function POST(req: Request) {
       `,
     });
 
-    console.log("Email sent successfully");
+    console.log("Email sent successfully via SMTP");
 
     return NextResponse.json({
       success: true,
