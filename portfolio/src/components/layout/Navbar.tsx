@@ -58,8 +58,7 @@ export default function Navbar() {
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="font-display font-bold text-lg text-text-primary hover:text-accent-blue transition-colors"
           >
-            <span className="gradient-text">{personalInfo.name.split(" ")[0]}</span>
-            <span className="text-text-primary"> {personalInfo.name.split(" ").slice(1).join(" ")}</span>
+            <span className="gradient-text">{personalInfo.name}</span>
           </button>
 
           {/* Desktop Nav */}
