@@ -59,9 +59,7 @@ export default function Navbar() {
             className="font-display font-bold text-lg text-text-primary hover:text-accent-blue transition-colors"
           >
             <span className="gradient-text">{personalInfo.name.split(" ")[0]}</span>
-            <span className="text-text-muted">
-              .{personalInfo.name.split(" ")[1]?.toLowerCase()}
-            </span>
+            <span className="text-text-primary"> {personalInfo.name.split(" ").slice(1).join(" ")}</span>
           </button>
 
           {/* Desktop Nav */}
