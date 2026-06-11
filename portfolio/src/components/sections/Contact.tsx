@@ -30,21 +30,34 @@ export default function Contact() {
     }
     setSending(true);
     try {
-      const response = await fetch("/api/contact", {
+      const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
+      if (!accessKey) {
+        throw new Error("Form key is not configured. Please set NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY.");
+      }
+
+      const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: form.name,
+          email: form.email,
+          subject: form.subject || "Portfolio Contact Form Submission",
+          message: form.message,
+          from_name: `${form.name} (Portfolio)`,
+        }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && data.success) {
         toast.success("Message sent! I'll get back to you soon 🚀");
         setForm({ name: "", email: "", subject: "", message: "" });
       } else {
-        throw new Error(data.error || "Failed to send message");
+        throw new Error(data.message || "Failed to send message");
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to send. Please email me directly.");
